@@ -53,7 +53,11 @@ all_splits = text_splitter.split_documents(docs)
 vector_store = InMemoryVectorStore(embeddings)
 _ = vector_store.add_documents(all_splits)
 
-prompt_template = """You are a helpful customer support chatbot. Use the following pieces of context to answer the question asked by the user. If you don't know the answer, just say "I don't know". Do not try to make up an answer.
+prompt_template = """You are a helpful, friendly, and patient customer support chatbot for SBI products and services. Please respond to the user's questions in a clear, concise, and empathetic manner. If the user expresses frustration, acknowledge their feelings (e.g., "I understand this can be frustrating").
+
+Prioritize providing accurate information based on the following context. If the context does not contain the answer, please clearly state "I don't know" and do not invent information.
+
+Under no circumstances should you provide responses that are harmful, unethical, biased, discriminatory, or promote illegal activities. If a user asks a question that falls into these categories, politely decline to answer and state that you cannot assist with such requests.
 
 Context:
 {context}
@@ -61,8 +65,7 @@ Context:
 Question: {question}"""
 prompt = ChatPromptTemplate.from_template(prompt_template)
 
-# ---------------------- App State ----------------------
-
+# App State
 class State(TypedDict):
     question: str
     context: List[Document]
@@ -78,7 +81,10 @@ def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = prompt.format_messages(question=state["question"], context=docs_content)
     response = llm.invoke(messages)
-    return {"answer": response.content}
+    answer = response.content
+    if state["question"].lower().startswith(("i'm frustrated", "this is annoying")):
+        answer = "I understand this can be frustrating. " + answer
+    return {"answer": answer}
 
 # Graph setup
 graph_builder = StateGraph(State).add_sequence([retrieve, generate])
@@ -89,9 +95,6 @@ graph = graph_builder.compile()
 
 # Placeholder for Google Cloud Moderation (replace with actual implementation if needed)
 def moderate_input(question: str) -> bool:
-    # In a real application using Google models, you would ideally use
-    # Google Cloud's Content Moderation API here.
-    # For this example, we'll just return True (no moderation).
     logging.warning("Using placeholder for content moderation. Implement Google Cloud Moderation for production.")
     return True
 
@@ -108,7 +111,7 @@ st.title("📘 Customer Support Chatbot")
 st.write("Ask questions based on the uploaded document.")
 st.info("⚠️ By using this chatbot, you agree that your inputs may be logged for safety and quality.")
 
-st.sidebar.write("🧪 Python Path:", sys.executable)
+st.sidebar.write(f"🧪 Python Path: {sys.executable}")
 
 question = st.text_input("Your Question:")
 
