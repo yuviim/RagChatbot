@@ -93,7 +93,6 @@ graph = graph_builder.compile()
 
 # ---------------------- Moderation & Logging ----------------------
 
-# Placeholder for Google Cloud Moderation (replace with actual implementation if needed)
 def moderate_input(question: str) -> bool:
     logging.warning("Using placeholder for content moderation. Implement Google Cloud Moderation for production.")
     return True
