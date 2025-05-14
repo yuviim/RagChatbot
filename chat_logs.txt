@@ -1,0 +1,4 @@
+WARNING:root:Using placeholder for content moderation. Implement Google Cloud Moderation for production.
+INFO:root:2025-05-14 23:44:39.427932+05:30 - QUESTION: what is the maximum loan eligibility for personal loan
+WARNING:root:Using placeholder for content moderation. Implement Google Cloud Moderation for production.
+INFO:root:2025-05-14 23:47:02.229766+05:30 - QUESTION: what are the KYC documents required for MAHILA SAMMAN SAVINGS CERTIFICATE
